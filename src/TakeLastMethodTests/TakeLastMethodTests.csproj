@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net472;netcoreapp2.1</TargetFrameworks>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.1'">
+    <DefineConstants>NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net472'">
+    <DefineConstants>NET472</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="runTestScript.ps1" />
+    <None Remove="test.cmd" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.11.4" />
+  </ItemGroup>
+
+</Project>

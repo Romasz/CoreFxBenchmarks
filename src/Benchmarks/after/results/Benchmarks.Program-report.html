@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8' />
+<title>Benchmarks.Program</title>
+
+<style type="text/css">
+	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	tr { background-color: #fff; border-top: 1px solid #ccc; }
+	tr:nth-child(even) { background: #f8f8f8; }
+</style>
+</head>
+<body>
+<pre><code>
+BenchmarkDotNet=v0.11.4, OS=Windows 10.0.17763.379 (1809/October2018Update/Redstone5)
+Intel Core i7-7820HQ CPU 2.90GHz (Kaby Lake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=2.1.505
+  [Host]     : .NET Core 2.1.9 (CoreCLR 4.6.27414.06, CoreFX 4.6.27415.01), 64bit RyuJIT
+  Job-FTITCG : .NET Core 46978f5e-7f77-4598-ba17-462c29c84838 (CoreCLR 4.6.27513.77, CoreFX 4.7.19.16601), 64bit RyuJIT
+</code></pre>
+<pre><code>Runtime=Core  Toolchain=CoreRun  
+</code></pre>
+
+<table>
+<thead><tr><th>      Method</th><th>    Mean</th><th>  Error</th><th> StdDev</th>
+</tr>
+</thead><tbody><tr><td>IEnumManyTakeMany</td><td>55,419.8 ns</td><td>387.431 ns</td><td>362.403 ns</td>
+</tr><tr><td>IListManyTakeMany</td><td>12,604.3 ns</td><td>93.503 ns</td><td>82.888 ns</td>
+</tr><tr><td>CustomManyTakeMany</td><td>1,223,763.6 ns</td><td>9,015.410 ns</td><td>8,433.020 ns</td>
+</tr><tr><td>IEnumManyTakeFew</td><td>410.1 ns</td><td>2.340 ns</td><td>2.189 ns</td>
+</tr><tr><td>IListManyTakeFew</td><td>180.6 ns</td><td>1.500 ns</td><td>1.404 ns</td>
+</tr><tr><td>CustomManyTakeFew</td><td>1,094,212.5 ns</td><td>11,083.325 ns</td><td>10,367.349 ns</td>
+</tr><tr><td>IEnumLessTakeMany</td><td>4,928.9 ns</td><td>30.969 ns</td><td>25.860 ns</td>
+</tr><tr><td>IListLessTakeMany</td><td>1,068.7 ns</td><td>11.259 ns</td><td>10.532 ns</td>
+</tr><tr><td>CustomLessTakeMany</td><td>16,160.8 ns</td><td>107.127 ns</td><td>100.207 ns</td>
+</tr><tr><td>IEnumFewTakeFew</td><td>402.5 ns</td><td>4.281 ns</td><td>4.004 ns</td>
+</tr><tr><td>IListFewTakeFew</td><td>178.3 ns</td><td>1.444 ns</td><td>1.280 ns</td>
+</tr><tr><td>CustomFewTakeFew</td><td>11,456.5 ns</td><td>46.616 ns</td><td>38.926 ns</td>
+</tr></tbody></table>
+</body>
+</html>
