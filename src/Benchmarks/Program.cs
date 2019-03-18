@@ -1,4 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
 using System;
 using System.Collections.Generic;
@@ -10,7 +13,10 @@ namespace Benchmarks
     {
         static void Main(string[] args)
         {
-            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+            BenchmarkSwitcher
+                .FromAssembly(typeof(Program).Assembly)
+                .Run(args, ManualConfig.Create(DefaultConfig.Instance)
+                                       .With(SummaryStyle.Default.WithTimeUnit(TimeUnit.Microsecond)));
         }
 
         public IEnumerable<string> _iListMany;
