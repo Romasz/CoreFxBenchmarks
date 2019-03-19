@@ -1,22 +1,55 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using BenchmarkDotNet.Analysers;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Filters;
 using BenchmarkDotNet.Horology;
+using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Order;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Running;
+using BenchmarkDotNet.Toolchains.CoreRun;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Benchmarks
 {
     public class Program
     {
+        private class Config : ManualConfig
+        {
+            public Config(string artifactsFolder)
+            {
+                ArtifactsPath = Path.Combine(Directory.GetCurrentDirectory(), artifactsFolder);
+                Encoding = System.Text.Encoding.ASCII;
+                Options = ConfigOptions.Default;
+                SummaryStyle = SummaryStyle.Default.WithTimeUnit(TimeUnit.Microsecond);
+                UnionRule = ConfigUnionRule.Union;
+                //Orderer = new DefaultOrderer(SummaryOrderPolicy.Declared, MethodOrderPolicy.Alphabetical);
+
+                Add(ConsoleLogger.Default);
+                Add(DefaultColumnProviders.Instance);
+                Add(MarkdownExporter.GitHub);
+                Add(DefaultConfig.Instance.GetAnalysers().ToArray());
+                Add(DefaultConfig.Instance.GetValidators().ToArray());
+                Add(Job.Default.With(Platform.X64).With(Jit.RyuJit).WithId("CoreApp").With(new CoreRunToolchain(new FileInfo(@"C:\Current\GithubProjects\corefx\artifacts\bin\testhost\netcoreapp-Windows_NT-Release-x64\shared\Microsoft.NETCore.App\9.9.9\CoreRun.exe"))));
+                Add(Job.Default.With(Platform.X64).With(Jit.RyuJit).WithId("UAP").With(new CoreRunToolchain(new FileInfo(@"C:\Current\GithubProjects\corefx\artifacts\bin\testhost\uap-Windows_NT-Release-x64\UAPLayout\CoreRun.exe"))));
+            }
+        }
+
         static void Main(string[] args)
         {
-            BenchmarkSwitcher
-                .FromAssembly(typeof(Program).Assembly)
-                .Run(args, ManualConfig.Create(DefaultConfig.Instance)
-                                       .With(SummaryStyle.Default.WithTimeUnit(TimeUnit.Microsecond)));
+            BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(new string[] { "-f", "*" }, new Config(args[0]));
         }
 
         public IEnumerable<string> _iListMany;
@@ -52,6 +85,12 @@ namespace Benchmarks
             _iEnumerableFew = iterator;
             _iListFew = iterator.ToList();
             _customIteratorFew = CustomIterator(iterator, (x) => x + " custom");
+
+            var coreFxAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(Regex).GetTypeInfo().Assembly.Location);
+            var coreClrAssemblyInfo = FileVersionInfo.GetVersionInfo(typeof(object).GetTypeInfo().Assembly.Location);
+
+            Console.WriteLine($"// CoreFx version: {coreFxAssemblyInfo.FileVersion}, location {typeof(Regex).GetTypeInfo().Assembly.Location}, product version {coreFxAssemblyInfo.ProductVersion}");
+            Console.WriteLine($"// CoreClr version {coreClrAssemblyInfo.FileVersion}, location {typeof(object).GetTypeInfo().Assembly.Location}, product version {coreClrAssemblyInfo.ProductVersion}");
         }
 
         [Benchmark]
